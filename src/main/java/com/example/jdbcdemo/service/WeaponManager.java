@@ -32,6 +32,7 @@ public class WeaponManager {
 	private PreparedStatement delAllBulletsStmt;
 	private PreparedStatement getAllBulletsStmt;
 	private PreparedStatement getWeaponsWithBullet;
+	private PreparedStatement getWeaponsStmt;
 
 // Weapon statements
 	private PreparedStatement addWeaponsStmt;
@@ -99,6 +100,8 @@ public class WeaponManager {
 					.prepareStatement("SELECT id_bullet, name FROM Bullet");
 			getWeaponsWithBullet = connection
 					.prepareStatement("SELECT id_weapon, name FROM Weapon WHERE id_weapon IN (SELECT id_weapon FROM WeaponBullets WHERE id_bullet = ?)");
+			getWeaponsStmt = connection
+					.prepareStatement("SELECT id_weapon FROM WeaponBullets WHERE id_weapon = ?");
 // Weapons statement
 			addWeaponsStmt = connection
 					.prepareStatement("INSERT INTO Weapon (id_weapon, name) VALUES (?,?)");
@@ -221,15 +224,14 @@ public class WeaponManager {
 		return count;
 	}
 	
-	public int delWeaponWithBullet(Weapon weapon) {
-		int count = 0;
+	public Weapon delWeaponWithBullet(Weapon weapon) {
 		try {
 			delWeaponWithBulletStmt.setInt(1, weapon.getId());
-			count = delWeaponWithBulletStmt.executeUpdate();
+			delWeaponWithBulletStmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return count;
+		return weapon;
 	}
 	
 	public List<WeaponBullets> getAllBulletToWeapon() {
@@ -269,95 +271,21 @@ public class WeaponManager {
 		return weapons;
 	}
 	
-	
-	
-	
-//	public int addWeapon(Weapon weapon) {
-//		int count = 0;
-//		try {
-//			addWeaponStmt.setString(1, weapon.getName());
-//			addWeaponStmt.setInt(2, weapon.getYob());
-//			
-//			count = addWeaponStmt.executeUpdate();
-//			
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		return count;
-//	}
-	
-	
-	
-	
-	
-	
-//	public int delPerson(Rifle rifle) {
-//		int count = 0;
-//		try {
-//			delPersonStmt.setString(1, rifle.getName());
-//
-//			count = delPersonStmt.executeUpdate();
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		return count;
-//	}
-	
-//	public int updPerson(Rifle rifle) {
-//		int count = 0;
-//		
-//		try {
-//			
-//			
-//			updPersonStmt.setString(1, rifle.getName());
-//			updPersonStmt.setInt(2, rifle.getYob());
-//			updPersonStmt.setLong(3, rifle.getId());
-//			count = updPersonStmt.executeUpdate();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//				
-//		return count;
-//	}
-	
-//	public Rifle getPerson(Long id) {
-//		Rifle selPerson = new Rifle();
-//				
-//		try {
-//			getPersonStmt.setLong(1, id);
-//			ResultSet rs = getPersonStmt.executeQuery();
-//			
-//			while (rs.next()) {
-//				selPerson.setId(rs.getInt("id"));
-//				selPerson.setName(rs.getString("name"));
-//				selPerson.setYob(rs.getInt("yob"));
-//			}
-//			
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}		
-//		return selPerson;
-//	}
+public WeaponBullets getWeapons(Weapon weapon) {
+		
+		WeaponBullets weaponBullets = new WeaponBullets();
 
-//	public List<Rifle> getAllPersons() {
-//		List<Rifle> rifles = new ArrayList<Rifle>();
-//
-//		try {
-//			ResultSet rs = getAllPersonsStmt.executeQuery();
-//
-//			while (rs.next()) {
-//				Rifle p = new Rifle();
-//				p.setId(rs.getInt("id"));
-//				p.setName(rs.getString("name"));
-//				p.setYob(rs.getInt("yob"));
-//				rifles.add(p);
-//			}
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		return rifles;
-//	}
-
+		try {
+			getWeaponsStmt.setInt(1, weapon.getId());
+			ResultSet rs =getWeaponsStmt.executeQuery();
+			while (rs.next()) {
+				weaponBullets.setId_weapon(rs.getInt("id_weapon"));
+				weaponBullets.setId_bullet(rs.getInt("id_bullet"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return weaponBullets;
+	}
+	
 }

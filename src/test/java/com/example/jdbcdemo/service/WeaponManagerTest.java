@@ -16,13 +16,13 @@ public class WeaponManagerTest {
 	WeaponManager weaponManager = new WeaponManager();
 
 // INSERT DATA
-	private final static int[] bullet_ids = {1, 2, 3, 4, 5, 6};
-	private final static String[] bullet_names = {"12,7 × 99 mm NATO", ".30-06 Springfield", "7,62 x 51 mm NATO", "9 x 19 mm Parabellum", "5,56 x 45 mm", "7,62 × 39 mm wz. 43"};
-	private final static int[] weapon_ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-	private final static String[] weapon_names = {"M4A1", "M16", "G36", "Steyr AUG-77", "M107", "MP5", "USP", "M1 Garand", "G3", "M40A1", "UMP", "FN F2000", "AK 47"};
+	private final static int[] bullet_ids = {1, 2, 3, 4, 5, 6, 7, 8};
+	private final static String[] bullet_names = {"12,7 × 99 mm NATO", ".30-06 Springfield", "7,62 x 51 mm NATO", "9 x 19 mm Parabellum", "5,56 x 45 mm", "7,62 × 39 mm wz. 43", ".408 CheyTac", ".375 CheyTac"};
+	private final static int[] weapon_ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+	private final static String[] weapon_names = {"M4A1", "M16", "G36", "Steyr AUG-77", "M107", "MP5", "USP", "M1 Garand", "G3", "M40A1", "UMP", "FN F2000", "AK 47", "M21", "M200 Intervention", "FN Minimi"};
 	
-	private final static int[] bullet_types = {4, 4, 4, 4, 0, 3, 3, 1, 2, 2, 3, 4, 5};
-		
+	private final static int[] bullet_types = {5, 5, 5, 5, 1, 4, 4, 2, 3, 3, 4, 5, 6, 3, 7, 5};
+	
 	@Test
 	public void checkConnection(){
 		assertNotNull(weaponManager.getConnection());
@@ -74,7 +74,7 @@ public class WeaponManagerTest {
 	public void checkAddBulletToWeapon(){
 		Bullet[] bullet = new Bullet[bullet_ids.length];
 		Weapon[] weapon = new Weapon[weapon_ids.length];
-		WeaponBullets[] weaponBullets = new WeaponBullets[weapon_ids.length];
+		WeaponBullets[] weaponBullets = new WeaponBullets[weapon_ids.length + 2];
 		
 		for (int i = 0; i < bullet_ids.length; i++) {
 			bullet[i] = new Bullet(bullet_ids[i], bullet_names[i]);
@@ -82,8 +82,12 @@ public class WeaponManagerTest {
 		
 		for (int i = 0; i < weapon_ids.length; i++) {
 			weapon[i] = new Weapon(weapon_ids[i], weapon_names[i]);
-			weaponBullets[i] = new WeaponBullets(weapon_ids[i], bullet_ids[bullet_types[i]]);
+			weaponBullets[i] = new WeaponBullets(weapon_ids[i], bullet_types[i]);
 		}
+		
+// Add additional bullets for test (MANY TO MANY)
+		weaponBullets[weaponBullets.length - 2] = new WeaponBullets(weapon_ids[14], bullet_ids[7]);
+		weaponBullets[weaponBullets.length - 1] = new WeaponBullets(weapon_ids[15], bullet_ids[2]);
 
 		for(int i = 0; i < weaponBullets.length; i++) {
 			assertEquals(1, weaponManager.addBulletToWeapon(weaponBullets[i]));
@@ -112,11 +116,10 @@ public class WeaponManagerTest {
 		}
 
 		List<Weapon> weaponsRetrieved = weaponManager.getWeaponsWithBullet(bullet);
-		
 		assertEquals(count, weaponsRetrieved.size());
 	}
 	
-	@Test
+//	@Test
 	public void checkDelWeaponWithBullet(){
 		Weapon[] weapon = new Weapon[weapon_ids.length];
 		
@@ -125,7 +128,8 @@ public class WeaponManagerTest {
 		}
 
 		for(int i = 0; i < weapon.length; i++) {
-			assertEquals(1, weaponManager.delWeaponWithBullet(weapon[i]));
+			weaponManager.delWeaponWithBullet(weapon[i]);
+			assertNull(weaponManager.getWeapons(weapon[i]));
 		}
 	}		
 	
